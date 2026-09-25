@@ -1,0 +1,29 @@
+{
+  "name": "samsung-timesheet",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Extensão de navegador para apontamento de horas no Jira, com dados 100% locais.",
+  "scripts": {
+    "icons": "node scripts/generate-icons.mjs",
+    "build": "npm run icons && tsc --noEmit && vite build && vite build -c vite.content.config.ts",
+    "dev": "vite build --watch --mode development"
+  },
+  "dependencies": {
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.468.0",
+    "motion": "^11.15.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.1.1"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.287",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.6"
+  }
+}

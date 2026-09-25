@@ -1,0 +1,60 @@
+.worklogEditorForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.worklogEditorForm__timing {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.worklogEditorForm__date {
+  grid-column: 1 / -1;
+}
+
+.worklogEditorForm__presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.worklogEditorForm__preset {
+  min-height: 2rem;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 140ms var(--ease-out),
+    color 140ms var(--ease-out);
+}
+
+.worklogEditorForm__preset:hover {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+}
+
+.worklogEditorForm__remoteNote {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.worklogEditorForm__footerSpacer {
+  flex: 1;
+}
+
+@media screen and (min-width: 601px) {
+  .worklogEditorForm__timing {
+    grid-template-columns: 1.4fr 1fr 1fr;
+  }
+
+  .worklogEditorForm__date {
+    grid-column: auto;
+  }
+}

@@ -1,0 +1,216 @@
+.calendarEntryBlock {
+  position: absolute;
+  touch-action: none;
+}
+
+.calendarEntryBlock--dragging {
+  z-index: 40 !important;
+}
+
+.calendarEntryBlock__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  height: 100%;
+  min-height: 0;
+  padding: 0.2rem 1.35rem 0.2rem 0.4rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--calendar-entry-accent) 28%, var(--color-border));
+  border-left: 3px solid var(--calendar-entry-accent);
+  border-radius: 0.4rem;
+  background: var(--calendar-entry-background, var(--color-surface));
+  color: var(--color-text);
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  cursor: grab;
+  box-shadow: 0 1px 2px rgba(28, 28, 33, 0.06);
+  transition: box-shadow 160ms var(--ease-out);
+  user-select: none;
+}
+
+.calendarEntryBlock__card:hover {
+  box-shadow: var(--shadow-soft);
+}
+
+.calendarEntryBlock--dragging .calendarEntryBlock__card {
+  cursor: grabbing;
+  box-shadow: var(--shadow-float);
+}
+
+.calendarEntryBlock--pending {
+  --calendar-entry-background: color-mix(in srgb, var(--color-warning-soft) 70%, var(--color-surface));
+}
+
+.calendarEntryBlock--uploaded {
+  --calendar-entry-background: color-mix(in srgb, var(--color-accent-soft) 55%, var(--color-surface));
+}
+
+.calendarEntryBlock--remote {
+  --calendar-entry-background: var(--color-surface);
+}
+
+.calendarEntryBlock--compact .calendarEntryBlock__card {
+  padding: 0.1rem 1.2rem 0.1rem 0.35rem;
+  justify-content: center;
+}
+
+.calendarEntryBlock__issueRow {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.calendarEntryBlock__typeMark {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: 0.2rem;
+  color: #fff;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.calendarEntryBlock__typeMark--bug {
+  background: var(--color-danger);
+}
+
+.calendarEntryBlock__typeMark--story {
+  background: var(--color-success);
+}
+
+.calendarEntryBlock__typeMark--task {
+  background: var(--color-accent);
+}
+
+.calendarEntryBlock__typeMark--epic {
+  background: #7a5af8;
+}
+
+.calendarEntryBlock__typeMark--default {
+  background: var(--color-text-muted);
+}
+
+.calendarEntryBlock__compactRow {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.calendarEntryBlock__key,
+.calendarEntryBlock__keyLink {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.calendarEntryBlock__keyLink {
+  color: var(--color-accent-text);
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.calendarEntryBlock__keyLink:hover {
+  color: var(--color-accent);
+}
+
+.calendarEntryBlock__summary {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text);
+}
+
+.calendarEntryBlock__time,
+.calendarEntryBlock__duration {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.calendarEntryBlock__duration {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.calendarEntryBlock__copy {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.2rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0.3rem;
+  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 140ms var(--ease-out),
+    color 140ms var(--ease-out),
+    background 140ms var(--ease-out);
+}
+
+.calendarEntryBlock__card:hover .calendarEntryBlock__copy,
+.calendarEntryBlock__copy:focus-visible {
+  opacity: 1;
+}
+
+.calendarEntryBlock__copy:hover {
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+}
+
+.calendarEntryBlock__resizeHandle {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 3;
+  height: 0.7rem;
+  cursor: ns-resize;
+}
+
+.calendarEntryBlock__resizeHandle--start {
+  top: 0;
+}
+
+.calendarEntryBlock__resizeHandle--end {
+  bottom: 0;
+}
+
+.calendarEntryBlock__resizeHandle::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  width: 1.75rem;
+  height: 0.2rem;
+  border-radius: var(--radius-full);
+  background: var(--calendar-entry-accent);
+  opacity: 0;
+  transform: translateX(-50%);
+  transition: opacity 140ms var(--ease-out);
+}
+
+.calendarEntryBlock__resizeHandle--start::after {
+  top: 0.15rem;
+}
+
+.calendarEntryBlock__resizeHandle--end::after {
+  bottom: 0.15rem;
+}
+
+.calendarEntryBlock__card:hover .calendarEntryBlock__resizeHandle::after,
+.calendarEntryBlock--dragging .calendarEntryBlock__resizeHandle::after {
+  opacity: 0.85;
+}

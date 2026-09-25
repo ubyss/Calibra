@@ -1,0 +1,70 @@
+.calendarCopyGhost {
+  position: fixed;
+  z-index: 80;
+  width: 11rem;
+  pointer-events: none;
+  transform: rotate(-2deg);
+  filter: drop-shadow(0 0.5rem 1.25rem rgba(28, 28, 33, 0.22));
+}
+
+.calendarCopyGhost__card {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 100%;
+  min-height: 1.75rem;
+  padding: 0.3rem 0.55rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--calendar-entry-accent) 35%, var(--color-border));
+  border-left: 3px solid var(--calendar-entry-accent);
+  border-radius: 0.45rem;
+  background: color-mix(in srgb, var(--color-surface) 92%, var(--calendar-entry-accent));
+  opacity: 0.95;
+}
+
+.calendarCopyGhost__typeMark {
+  width: 0.7rem;
+  height: 0.7rem;
+  flex-shrink: 0;
+  border-radius: 0.15rem;
+  background: var(--color-text-muted);
+}
+
+.calendarCopyGhost__typeMark--bug {
+  background: var(--color-danger);
+}
+
+.calendarCopyGhost__typeMark--story {
+  background: var(--color-success);
+}
+
+.calendarCopyGhost__typeMark--task {
+  background: var(--color-accent);
+}
+
+.calendarCopyGhost__typeMark--epic {
+  background: #7a5af8;
+}
+
+.calendarCopyGhost__typeMark--default {
+  background: var(--color-text-muted);
+}
+
+.calendarCopyGhost__key {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-accent-text);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendarCopyGhost__duration {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,42 @@
+.segmentedControl {
+  display: inline-flex;
+  gap: 0.125rem;
+  max-width: 100%;
+  padding: 0.1875rem;
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  scrollbar-width: none;
+}
+
+.segmentedControl__option {
+  position: relative;
+  min-height: 2.5rem;
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: calc(var(--radius-md) - 0.1875rem);
+  background: none;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 160ms var(--ease-out);
+}
+
+.segmentedControl__option:hover,
+.segmentedControl__option--active {
+  color: var(--color-text);
+}
+
+.segmentedControl__highlight {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.segmentedControl__label {
+  position: relative;
+}

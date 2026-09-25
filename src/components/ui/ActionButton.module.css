@@ -1,0 +1,110 @@
+.actionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target);
+  padding: 0 var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 160ms var(--ease-out),
+    border-color 160ms var(--ease-out),
+    color 160ms var(--ease-out),
+    box-shadow 160ms var(--ease-out);
+}
+
+.actionButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actionButton--primary {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15) inset, 0 0.25rem 0.75rem rgba(91, 91, 214, 0.25);
+}
+
+.actionButton--primary:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
+.actionButton--secondary {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.actionButton--secondary:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-strong);
+}
+
+.actionButton--ghost {
+  background: transparent;
+  color: var(--color-text-muted);
+}
+
+.actionButton--ghost:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.actionButton--danger {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.actionButton--danger:hover:not(:disabled) {
+  background: var(--color-danger);
+  color: var(--color-on-accent);
+}
+
+.actionButton[aria-pressed='true'] {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+}
+
+.actionButton[aria-pressed='true'] .actionButton__icon {
+  fill: color-mix(in srgb, currentColor 25%, transparent);
+}
+
+.actionButton--compact {
+  min-height: 2.25rem;
+  padding: 0 var(--space-3);
+  font-size: 0.8125rem;
+}
+
+.actionButton--iconOnly {
+  width: var(--touch-target);
+  padding: 0;
+}
+
+.actionButton--compact.actionButton--iconOnly {
+  width: 2.25rem;
+}
+
+.actionButton__icon {
+  flex-shrink: 0;
+  width: 1.05em;
+  height: 1.05em;
+}
+
+.actionButton__spinner {
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: actionButtonSpin 700ms linear infinite;
+}
+
+@keyframes actionButtonSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}

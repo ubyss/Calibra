@@ -1,0 +1,115 @@
+.connectPage {
+  display: grid;
+  min-height: 100vh;
+  background:
+    radial-gradient(60rem 30rem at 10% -10%, var(--color-accent-soft), transparent 70%),
+    var(--color-canvas);
+}
+
+.connectPage__layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4);
+}
+
+.connectPage__intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.connectPage__logo {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.875rem;
+  background: linear-gradient(135deg, #7c7cf0, #4840c4);
+  color: #ffffff;
+  box-shadow: 0 0.75rem 2rem rgba(91, 91, 214, 0.35);
+}
+
+.connectPage__title {
+  font-size: clamp(2rem, 1.4rem + 2.4vw, 3rem);
+  font-weight: 750;
+  letter-spacing: -0.03em;
+}
+
+.connectPage__lead {
+  max-width: 30rem;
+  font-size: 1.0625rem;
+  color: var(--color-text-muted);
+}
+
+.connectPage__promises {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.connectPage__promise {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.connectPage__promiseIcon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-accent);
+  box-shadow: var(--shadow-soft);
+}
+
+.connectPage__promiseTitle {
+  font-weight: 650;
+}
+
+.connectPage__promiseText {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.connectPage__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.connectPage__warning {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+  font-size: 0.8125rem;
+}
+
+.connectPage__helpLink {
+  font-size: 0.8125rem;
+}
+
+@media screen and (min-width: 601px) {
+  .connectPage__layout {
+    padding: var(--space-7) var(--space-6);
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .connectPage__layout {
+    display: grid;
+    grid-template-columns: 1fr 28rem;
+    align-items: center;
+    gap: var(--space-7);
+  }
+}

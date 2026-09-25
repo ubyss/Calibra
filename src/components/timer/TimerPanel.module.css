@@ -1,0 +1,98 @@
+.timerPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.timerPanel__active {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.timerPanel__dial {
+  position: relative;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 6.5rem;
+  height: 6.5rem;
+}
+
+.timerPanel__dialSvg {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+
+.timerPanel__dialTrack {
+  stroke: var(--color-surface-muted);
+}
+
+.timerPanel__dialProgress {
+  stroke: var(--color-accent);
+}
+
+.timerPanel--paused .timerPanel__dialProgress {
+  stroke: var(--color-text-subtle);
+}
+
+.timerPanel__pulse {
+  position: absolute;
+  inset: 0.625rem;
+  border-radius: 50%;
+  background: var(--color-accent-soft);
+}
+
+.timerPanel__clock {
+  position: relative;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.timerPanel__details {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.timerPanel__issueKey {
+  font-size: 0.8125rem;
+  font-weight: 650;
+  color: var(--color-accent-text);
+}
+
+.timerPanel__issueSummary {
+  display: -webkit-box;
+  overflow: hidden;
+  font-weight: 600;
+  line-height: 1.35;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.timerPanel__state {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.timerPanel__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.timerPanel__controlsGrow {
+  flex: 1;
+}
+
+.timerPanel__starter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}

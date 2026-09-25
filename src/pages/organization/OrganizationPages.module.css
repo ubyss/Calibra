@@ -1,0 +1,121 @@
+.organizationPage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.organizationPage__adder {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.organizationPage__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.organizationPage__entry {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 3.5rem;
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+}
+
+.organizationPage__entryText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.organizationPage__entryKey {
+  font-size: 0.8125rem;
+  font-weight: 650;
+  color: var(--color-accent-text);
+}
+
+.organizationPage__entryTitle {
+  overflow: hidden;
+  font-size: 0.9rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.organizationPage__entryActions {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.organizationPage__groups {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.organizationPage__members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.organizationPage__member {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.25rem 0.25rem 0.25rem 0.25rem;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-muted);
+  font-size: 0.8125rem;
+}
+
+.organizationPage__memberAvatar {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.organizationPage__memberRemove {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.organizationPage__memberRemove:hover {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.organizationPage__inlineForm {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.organizationPage__inlineForm > :first-child {
+  flex: 1;
+}
+
+@media screen and (min-width: 1024px) {
+  .organizationPage__groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

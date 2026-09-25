@@ -1,0 +1,71 @@
+.modalDialog {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.modalDialog__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 17, 20, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+.modalDialog__sheet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  width: 100%;
+  max-height: 92vh;
+  padding: var(--space-5) var(--space-4);
+  overflow-y: auto;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-float);
+}
+
+.modalDialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.modalDialog__title {
+  font-size: 1.25rem;
+  font-weight: 650;
+}
+
+.modalDialog__description {
+  margin-top: var(--space-1);
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.modalDialog__footer {
+  display: flex;
+  flex-wrap: wrap-reverse;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+@media screen and (min-width: 601px) {
+  .modalDialog {
+    align-items: center;
+    padding: var(--space-5);
+  }
+
+  .modalDialog__sheet {
+    width: min(100%, 32rem);
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+  }
+
+  .modalDialog__sheet--wide {
+    width: min(100%, 48rem);
+  }
+}

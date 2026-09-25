@@ -1,0 +1,138 @@
+.calendarGrid {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.calendarGrid--copyMode {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.calendarGrid--copyMode .calendarGrid__column {
+  cursor: copy;
+}
+
+.calendarGrid__header {
+  display: grid;
+  grid-template-columns: 3.5rem repeat(var(--calendar-columns), minmax(0, 1fr));
+  border-bottom: 1px solid var(--color-border);
+}
+
+.calendarGrid__dayHeading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: var(--space-3) var(--space-2);
+  border-left: 1px solid var(--color-border);
+}
+
+.calendarGrid__dayName {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: capitalize;
+}
+
+.calendarGrid__dayNumber {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.calendarGrid__todayBadge {
+  align-self: flex-start;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.calendarGrid__dayHeading--today .calendarGrid__dayName,
+.calendarGrid__dayHeading--today .calendarGrid__dayNumber {
+  color: var(--color-accent-text);
+}
+
+.calendarGrid__dayTotal {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.calendarGrid__scroller {
+  max-height: 68vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.calendarGrid__body {
+  position: relative;
+  display: grid;
+  grid-template-columns: 3.5rem repeat(var(--calendar-columns), minmax(0, 1fr));
+}
+
+.calendarGrid__gutter {
+  position: relative;
+}
+
+.calendarGrid__hourLabel {
+  position: absolute;
+  right: var(--space-2);
+  font-size: 0.6875rem;
+  color: var(--color-text-subtle);
+  font-variant-numeric: tabular-nums;
+  transform: translateY(-50%);
+}
+
+.calendarGrid__column {
+  position: relative;
+  border-left: 1px solid var(--color-border);
+  background-image:
+    linear-gradient(to bottom, var(--color-border-strong) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--color-border) 70%, transparent) 1px, transparent 1px);
+  background-size:
+    100% var(--calendar-hour-height),
+    100% var(--calendar-slot-height);
+  cursor: copy;
+}
+
+.calendarGrid__column--weekend {
+  background-color: color-mix(in srgb, var(--color-surface-muted) 60%, transparent);
+}
+
+.calendarGrid__workingHours {
+  position: absolute;
+  right: 0;
+  left: 0;
+  background: color-mix(in srgb, var(--color-accent-soft) 35%, transparent);
+  pointer-events: none;
+}
+
+.calendarGrid__nowLine {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 5;
+  height: 2px;
+  background: var(--color-danger);
+  pointer-events: none;
+}
+
+.calendarGrid__nowLine::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-danger);
+}

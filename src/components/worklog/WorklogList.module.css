@@ -1,0 +1,138 @@
+.worklogList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.worklogList__day {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.worklogList__dayHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 0 var(--space-1);
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.worklogList__dayTitle {
+  font-weight: 650;
+  color: var(--color-text);
+  text-transform: capitalize;
+}
+
+.worklogList__entry {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 3.5rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  cursor: pointer;
+  transition:
+    background-color 140ms var(--ease-out),
+    border-color 140ms var(--ease-out);
+}
+
+.worklogList__entry:hover {
+  background: var(--color-surface-hover);
+}
+
+.worklogList__entry--selected {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.worklogList__checkbox {
+  width: 1.125rem;
+  height: 1.125rem;
+  margin: 0;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+.worklogList__checkboxHit {
+  display: grid;
+  place-items: center;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  margin: calc(var(--space-2) * -1) 0 calc(var(--space-2) * -1) calc(var(--space-3) * -1);
+}
+
+.worklogList__time {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.worklogList__body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.worklogList__headline {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.worklogList__issueKey {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  color: var(--color-accent-text);
+}
+
+.worklogList__summary,
+.worklogList__comment {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.worklogList__summary {
+  font-size: 0.875rem;
+  font-weight: 550;
+}
+
+.worklogList__comment {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.worklogList__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.worklogList__duration {
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.worklogList__timeColumn {
+  display: none;
+}
+
+@media screen and (min-width: 601px) {
+  .worklogList__entry {
+    grid-template-columns: auto auto 1fr auto;
+  }
+
+  .worklogList__timeColumn {
+    display: block;
+    min-width: 6.5rem;
+  }
+}
