@@ -8,36 +8,185 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-3);
+  align-items: start;
 }
 
 .worklogEditorForm__date {
   grid-column: 1 / -1;
 }
 
-.worklogEditorForm__presets {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1);
+.worklogEditorForm__durationField {
+  position: relative;
+  grid-column: 1 / -1;
 }
 
-.worklogEditorForm__preset {
-  min-height: 2rem;
-  padding: 0 var(--space-3);
+.worklogEditorForm__durationTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--touch-target);
+  padding: 0 var(--space-1) 0 var(--space-3);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
   background: var(--color-surface);
-  color: var(--color-text-muted);
-  font-size: 0.8125rem;
-  font-weight: 600;
+  color: var(--color-text);
+  font-size: 0.9375rem;
+  font-weight: 550;
+  text-align: left;
   cursor: pointer;
   transition:
-    background-color 140ms var(--ease-out),
-    color 140ms var(--ease-out);
+    border-color 160ms var(--ease-out),
+    box-shadow 160ms var(--ease-out);
 }
 
-.worklogEditorForm__preset:hover {
-  background: var(--color-accent-soft);
+.worklogEditorForm__durationTrigger:hover {
+  border-color: var(--color-border-strong);
+}
+
+.worklogEditorForm__durationTrigger--open,
+.worklogEditorForm__durationTrigger:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 0.2rem var(--color-accent-soft);
+}
+
+.worklogEditorForm__durationTrigger--invalid {
+  border-color: var(--color-danger);
+}
+
+.worklogEditorForm__durationTriggerIcon {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: calc(var(--radius-md) - 0.125rem);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+}
+
+.worklogEditorForm__durationPopover {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  right: 0;
+  left: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-float);
+}
+
+.worklogEditorForm__durationPopoverHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.worklogEditorForm__durationPopoverTitle {
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.worklogEditorForm__durationPopoverValue {
+  color: var(--color-text);
+  font-size: 0.875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.worklogEditorForm__durationSliderTrack {
+  position: relative;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-muted);
+}
+
+.worklogEditorForm__durationSliderFill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  pointer-events: none;
+}
+
+.worklogEditorForm__durationSlider {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.worklogEditorForm__durationSlider::-webkit-slider-runnable-track {
+  height: 0.5rem;
+  background: transparent;
+}
+
+.worklogEditorForm__durationSlider::-webkit-slider-thumb {
+  appearance: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-top: -0.3125rem;
+  border: 2px solid var(--color-surface);
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 1px 4px rgba(28, 28, 33, 0.2);
+  cursor: grab;
+}
+
+.worklogEditorForm__durationSlider::-moz-range-track {
+  height: 0.5rem;
+  background: transparent;
+  border: 0;
+}
+
+.worklogEditorForm__durationSlider::-moz-range-thumb {
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 2px solid var(--color-surface);
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 1px 4px rgba(28, 28, 33, 0.2);
+  cursor: grab;
+}
+
+.worklogEditorForm__durationLabels {
+  position: relative;
+  height: 1.25rem;
+  margin: 0 0.4rem;
+}
+
+.worklogEditorForm__durationLabel {
+  position: absolute;
+  top: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+
+.worklogEditorForm__durationLabel--active {
   color: var(--color-accent-text);
+  font-weight: 700;
 }
 
 .worklogEditorForm__remoteNote {
@@ -51,10 +200,11 @@
 
 @media screen and (min-width: 601px) {
   .worklogEditorForm__timing {
-    grid-template-columns: 1.4fr 1fr 1fr;
+    grid-template-columns: 1.2fr repeat(3, minmax(0, 1fr));
   }
 
-  .worklogEditorForm__date {
+  .worklogEditorForm__date,
+  .worklogEditorForm__durationField {
     grid-column: auto;
   }
 }

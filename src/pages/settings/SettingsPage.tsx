@@ -8,6 +8,7 @@ import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { SurfacePanel } from '@/components/ui/SurfacePanel';
 import { ToggleSwitch } from '@/components/ui/ToggleSwitch';
 import { useToast } from '@/components/ui/ToastProvider';
+import { UpdateStatusPanel } from '@/components/update/UpdateStatusPanel';
 import { WEEKDAY_LABELS } from '@/constants/defaults';
 import { useStoredValue } from '@/hooks/useStoredValue';
 import { disconnectAccount } from '@/services/account-service';
@@ -54,6 +55,7 @@ export function SettingsPage() {
     <>
       <PageHeader title="Configurações" description="As preferências são salvas automaticamente, só neste navegador." />
       <div className={styles.settingsPage}>
+        <UpdateStatusPanel />
         {account && (
           <SurfacePanel title="Conta do Jira">
             <div className={styles.settingsPage__account}>
@@ -141,6 +143,12 @@ export function SettingsPage() {
               description="Mostra só os dias da semana na grade semanal."
               isChecked={settings.hideWeekends}
               onChange={(hideWeekends) => saveSettings({ hideWeekends })}
+            />
+            <ToggleSwitch
+              title="Envio automático ao Jira"
+              description="Salva e envia o worklog em cada alteração (criar, editar, arrastar)."
+              isChecked={settings.autoUploadWorklogs}
+              onChange={(autoUploadWorklogs) => saveSettings({ autoUploadWorklogs })}
             />
           </div>
         </SurfacePanel>

@@ -1,7 +1,7 @@
 {
   "name": "samsung-timesheet",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "description": "Extensão de navegador para apontamento de horas no Jira, com dados 100% locais.",
   "scripts": {

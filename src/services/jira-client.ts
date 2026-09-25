@@ -192,7 +192,7 @@ export class JiraClient {
   }
 
   async getIssueWorklogs(
-    issue: Pick<JiraIssue, 'key' | 'summary' | 'issueTypeName'>,
+    issue: Pick<JiraIssue, 'key' | 'summary' | 'issueTypeName' | 'issueTypeIconUrl'>,
     from: Date,
     to: Date,
   ): Promise<JiraRemoteWorklog[]> {

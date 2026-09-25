@@ -14,9 +14,9 @@
   gap: 0.1rem;
   height: 100%;
   min-height: 0;
-  padding: 0.2rem 1.35rem 0.2rem 0.4rem;
+  padding: 0.35rem 1.35rem 0.3rem 0.5rem;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--calendar-entry-accent) 28%, var(--color-border));
+  border: 1px solid var(--color-border);
   border-left: 3px solid var(--calendar-entry-accent);
   border-radius: 0.4rem;
   background: var(--calendar-entry-background, var(--color-surface));
@@ -42,17 +42,52 @@
   --calendar-entry-background: color-mix(in srgb, var(--color-warning-soft) 70%, var(--color-surface));
 }
 
+.calendarEntryBlock--remote,
 .calendarEntryBlock--uploaded {
-  --calendar-entry-background: color-mix(in srgb, var(--color-accent-soft) 55%, var(--color-surface));
-}
-
-.calendarEntryBlock--remote {
   --calendar-entry-background: var(--color-surface);
 }
 
 .calendarEntryBlock--compact .calendarEntryBlock__card {
-  padding: 0.1rem 1.2rem 0.1rem 0.35rem;
+  padding: 0.1rem 1.35rem 0.1rem 0.4rem;
   justify-content: center;
+}
+
+.calendarEntryBlock--compact .calendarEntryBlock__duration {
+  display: none;
+}
+
+.calendarEntryBlock--compact .calendarEntryBlock__copy {
+  top: 50%;
+  right: 0.15rem;
+  z-index: 5;
+  width: 1.1rem;
+  height: 1.1rem;
+  opacity: 0;
+  transform: translateY(-50%);
+}
+
+.calendarEntryBlock--compact .calendarEntryBlock__card:hover .calendarEntryBlock__copy,
+.calendarEntryBlock--compact .calendarEntryBlock__copy:focus-visible {
+  opacity: 1;
+}
+
+/* Handle fino só embaixo: o de cima cortava a borda arredondada nos 15 min */
+.calendarEntryBlock--compact .calendarEntryBlock__resizeHandle--end {
+  right: 1.25rem;
+  z-index: 3;
+  height: 0.4rem;
+}
+
+.calendarEntryBlock--compact .calendarEntryBlock__resizeHandle--end::after {
+  bottom: 0.2rem;
+  width: 1.25rem;
+  height: 0.15rem;
+  opacity: 0;
+}
+
+.calendarEntryBlock--compact .calendarEntryBlock__card:hover .calendarEntryBlock__resizeHandle--end::after,
+.calendarEntryBlock--compact.calendarEntryBlock--dragging .calendarEntryBlock__resizeHandle--end::after {
+  opacity: 0.85;
 }
 
 .calendarEntryBlock__issueRow {
@@ -69,31 +104,12 @@
   justify-content: center;
   width: 0.875rem;
   height: 0.875rem;
-  border-radius: 0.2rem;
-  color: #fff;
-  font-size: 0.5625rem;
-  font-weight: 700;
-  line-height: 1;
 }
 
-.calendarEntryBlock__typeMark--bug {
-  background: var(--color-danger);
-}
-
-.calendarEntryBlock__typeMark--story {
-  background: var(--color-success);
-}
-
-.calendarEntryBlock__typeMark--task {
-  background: var(--color-accent);
-}
-
-.calendarEntryBlock__typeMark--epic {
-  background: #7a5af8;
-}
-
-.calendarEntryBlock__typeMark--default {
-  background: var(--color-text-muted);
+.calendarEntryBlock__typeMark img {
+  width: 0.875rem;
+  height: 0.875rem;
+  object-fit: contain;
 }
 
 .calendarEntryBlock__compactRow {
@@ -130,8 +146,12 @@
 .calendarEntryBlock__duration {
   color: var(--color-text-muted);
   font-variant-numeric: tabular-nums;
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   font-weight: 600;
+}
+
+.calendarEntryBlock__time {
+  margin-top: auto;
 }
 
 .calendarEntryBlock__duration {

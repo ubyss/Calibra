@@ -8,6 +8,7 @@ import { ActionButton } from '@/components/ui/ActionButton';
 import { TextInput } from '@/components/ui/FormField';
 import { useToast } from '@/components/ui/ToastProvider';
 import { useRunningTimer } from '@/hooks/useRunningTimer';
+import { useStoredValue } from '@/hooks/useStoredValue';
 import {
   discardTimer,
   pauseTimer,
@@ -26,6 +27,7 @@ const SWAP_TRANSITION = { duration: 0.25, ease: [0.2, 0.8, 0.2, 1] as const };
 
 export function TimerPanel() {
   const { notify } = useToast();
+  const { value: settings } = useStoredValue('settings');
   const { timer, elapsedSeconds, isRunning } = useRunningTimer();
   const [selectedIssue, setSelectedIssue] = useState<IssueSelection | null>(null);
   const [comment, setComment] = useState('');
@@ -56,7 +58,11 @@ export function TimerPanel() {
       await updateTimerComment(comment);
       const worklog = await stopTimer();
       if (worklog) {
-        notify(`${formatDuration(worklog.durationSeconds)} salvos em ${worklog.issueKey}. Envie quando quiser.`);
+        notify(
+          settings.autoUploadWorklogs
+            ? 'Worklog salvo.'
+            : `${formatDuration(worklog.durationSeconds)} salvos em ${worklog.issueKey}. Envie quando quiser.`,
+        );
       }
     });
   };

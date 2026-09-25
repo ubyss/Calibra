@@ -1,7 +1,6 @@
 import {
   BarChart3,
   Bookmark,
-  CalendarDays,
   FileUp,
   Gauge,
   LayoutDashboard,
@@ -28,7 +27,6 @@ export const NAVIGATION_SECTIONS: NavigationSection[] = [
     title: 'Dia a dia',
     links: [
       { path: '/', label: 'Painel', icon: LayoutDashboard },
-      { path: '/calendario', label: 'Calendário', icon: CalendarDays },
       { path: '/worklogs', label: 'Worklogs', icon: ListChecks },
       { path: '/importar', label: 'Importar', icon: FileUp },
     ],

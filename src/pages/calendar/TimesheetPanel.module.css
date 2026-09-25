@@ -6,15 +6,49 @@
 
 .timesheetPanel__toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
 }
 
+.timesheetPanel__user {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.timesheetPanel__avatar {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.timesheetPanel__userName {
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: 0.875rem;
+  font-weight: 550;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .timesheetPanel__legend {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3);
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   font-size: 0.75rem;
   color: var(--color-text-muted);
 }
@@ -22,13 +56,14 @@
 .timesheetPanel__legendItem {
   display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
+  gap: 0.5rem;
 }
 
 .timesheetPanel__legendSwatch {
-  width: 0.625rem;
-  height: 0.625rem;
-  border-radius: 0.125rem;
+  width: 0.1875rem;
+  height: 0.875rem;
+  flex-shrink: 0;
+  border-radius: 1px;
 }
 
 .timesheetPanel__legendSwatch--green {
@@ -67,9 +102,11 @@
   padding: var(--space-2);
   border-bottom: 1px solid var(--color-border);
   color: var(--color-text-muted);
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.6875rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
   text-align: center;
+  text-transform: uppercase;
 }
 
 .timesheetPanel__dayHeader--weekend {
@@ -82,36 +119,39 @@
 }
 
 .timesheetPanel__dayWeekday {
-  text-transform: capitalize;
+  margin-top: 0.125rem;
   font-weight: 500;
+  letter-spacing: 0;
+  text-transform: capitalize;
 }
 
 .timesheetPanel__cell,
 .timesheetPanel__totalCell {
-  padding: var(--space-3) var(--space-2);
+  padding: var(--space-4) var(--space-2);
   border-bottom: 1px solid var(--color-border);
   text-align: center;
   font-variant-numeric: tabular-nums;
+  background: var(--color-surface);
 }
 
 .timesheetPanel__cell--weekend {
-  background: var(--color-surface-muted);
+  color: var(--color-text-subtle);
 }
 
-.timesheetPanel__cell--green {
-  background: color-mix(in srgb, #00875a 12%, transparent);
+.timesheetPanel__statusAccent--green {
+  box-shadow: inset 3px 0 0 #00875a;
 }
 
-.timesheetPanel__cell--orange {
-  background: color-mix(in srgb, #ff7a00 12%, transparent);
+.timesheetPanel__statusAccent--orange {
+  box-shadow: inset 3px 0 0 #ff7a00;
 }
 
-.timesheetPanel__cell--pink {
-  background: color-mix(in srgb, #ae2a19 12%, transparent);
+.timesheetPanel__statusAccent--pink {
+  box-shadow: inset 3px 0 0 #ae2a19;
 }
 
 .timesheetPanel__hours {
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: 650;
   color: var(--color-text);
 }
@@ -139,66 +179,87 @@
 .timesheetPanel__monthGrid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 0.375rem;
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
 }
 
 .timesheetPanel__weekdayLabel {
-  padding: 0.25rem;
+  padding: 0.625rem 0.5rem;
+  border-right: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
   color: var(--color-text-muted);
   font-size: 0.6875rem;
   font-weight: 650;
+  letter-spacing: 0.06em;
   text-align: center;
   text-transform: uppercase;
+  background: var(--color-surface);
+}
+
+.timesheetPanel__weekdayLabel:nth-child(7) {
+  border-right: 0;
 }
 
 .timesheetPanel__monthDay {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  min-height: 4.25rem;
-  padding: 0.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  gap: 0.35rem;
+  min-height: 4.75rem;
+  padding: 0.625rem 0.7rem;
+  border-right: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
   background: var(--color-surface);
 }
 
+.timesheetPanel__monthDay:nth-child(7n) {
+  border-right: 0;
+}
+
+.timesheetPanel__monthDay:nth-last-child(-n + 7) {
+  border-bottom: 0;
+}
+
 .timesheetPanel__monthDay--empty {
-  border-color: transparent;
-  background: transparent;
+  background: color-mix(in srgb, var(--color-surface-muted) 45%, var(--color-surface));
 }
 
 .timesheetPanel__monthDay--weekend {
-  background: var(--color-surface-muted);
-}
-
-.timesheetPanel__monthDay--green {
-  border-color: color-mix(in srgb, #00875a 35%, var(--color-border));
-  background: color-mix(in srgb, #00875a 10%, var(--color-surface));
-}
-
-.timesheetPanel__monthDay--orange {
-  border-color: color-mix(in srgb, #ff7a00 35%, var(--color-border));
-  background: color-mix(in srgb, #ff7a00 10%, var(--color-surface));
-}
-
-.timesheetPanel__monthDay--pink {
-  border-color: color-mix(in srgb, #ae2a19 35%, var(--color-border));
-  background: color-mix(in srgb, #ae2a19 10%, var(--color-surface));
+  background: color-mix(in srgb, var(--color-surface-muted) 35%, var(--color-surface));
 }
 
 .timesheetPanel__monthDayNumber {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
   font-size: 0.8125rem;
-  font-weight: 650;
+  font-weight: 550;
   color: var(--color-text);
 }
 
 .timesheetPanel__monthDayNumber--today {
+  border: 1.5px solid var(--color-accent);
+  border-radius: 50%;
   color: var(--color-accent-text);
+  font-weight: 700;
 }
 
 .timesheetPanel__monthHours {
   margin-top: auto;
   font-size: 0.8125rem;
-  font-weight: 700;
+  font-weight: 650;
   font-variant-numeric: tabular-nums;
+}
+
+@media screen and (min-width: 601px) {
+  .timesheetPanel {
+    gap: var(--space-5);
+  }
+
+  .timesheetPanel__monthDay {
+    min-height: 5.25rem;
+    padding: 0.75rem;
+  }
 }

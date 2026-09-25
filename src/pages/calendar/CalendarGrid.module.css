@@ -16,25 +16,64 @@
   cursor: copy;
 }
 
-.calendarGrid__header {
+.calendarGrid__scroller {
+  max-height: 68vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.calendarGrid__sheet {
   display: grid;
   grid-template-columns: 3.5rem repeat(var(--calendar-columns), minmax(0, 1fr));
-  border-bottom: 1px solid var(--color-border);
+}
+
+.calendarGrid__header,
+.calendarGrid__body {
+  display: contents;
+}
+
+.calendarGrid__corner,
+.calendarGrid__dayHeading {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  background: var(--color-surface);
+  box-shadow: inset 0 -1px 0 var(--color-border);
+}
+
+.calendarGrid__corner {
+  align-self: stretch;
 }
 
 .calendarGrid__dayHeading {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  padding: var(--space-3) var(--space-2);
+  gap: 0.35rem;
+  min-width: 0;
+  padding: var(--space-2) var(--space-2);
   border-left: 1px solid var(--color-border);
 }
 
+.calendarGrid__dayHeadingMeta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
 .calendarGrid__dayName {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--color-text-muted);
   text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .calendarGrid__dayNumber {
@@ -45,38 +84,35 @@
 }
 
 .calendarGrid__todayBadge {
-  align-self: flex-start;
-  padding: 0.1rem 0.4rem;
+  flex-shrink: 0;
+  padding: 0.1rem 0.35rem;
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-full);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
-  font-size: 0.625rem;
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  font-size: 0.5625rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  line-height: 1.2;
 }
 
 .calendarGrid__dayHeading--today .calendarGrid__dayName,
 .calendarGrid__dayHeading--today .calendarGrid__dayNumber {
-  color: var(--color-accent-text);
+  color: var(--color-text);
 }
 
 .calendarGrid__dayTotal {
-  font-size: 0.75rem;
+  flex-shrink: 0;
+  font-size: 0.6875rem;
   color: var(--color-text-muted);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
-.calendarGrid__scroller {
-  max-height: 68vh;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-.calendarGrid__body {
-  position: relative;
-  display: grid;
-  grid-template-columns: 3.5rem repeat(var(--calendar-columns), minmax(0, 1fr));
+.calendarGrid__gutter,
+.calendarGrid__column {
+  height: var(--calendar-body-height);
 }
 
 .calendarGrid__gutter {
@@ -135,4 +171,79 @@
   height: 10px;
   border-radius: 50%;
   background: var(--color-danger);
+}
+
+.calendarGrid__dropPreview {
+  position: absolute;
+  right: 3px;
+  left: 3px;
+  z-index: 35;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-height: 1.75rem;
+  padding: 0.35rem 0.5rem;
+  overflow: hidden;
+  border: 1px dashed var(--calendar-entry-accent, var(--color-accent));
+  border-left: 3px solid var(--calendar-entry-accent, var(--color-accent));
+  border-radius: 0.4rem;
+  background: color-mix(in srgb, var(--calendar-entry-accent, var(--color-accent)) 16%, var(--color-surface));
+  box-shadow: var(--shadow-soft);
+  pointer-events: none;
+}
+
+.calendarGrid__dropPreviewMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.calendarGrid__dropPreviewTypeMark {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.calendarGrid__dropPreviewTypeMark img {
+  width: 0.875rem;
+  height: 0.875rem;
+  object-fit: contain;
+}
+
+.calendarGrid__dropPreviewKey {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-accent-text);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendarGrid__dropPreviewDuration {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.calendarGrid__dropPreviewTime {
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.calendarGrid__dropPreviewSummary {
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

@@ -6,6 +6,7 @@ export interface JiraIssue {
   statusName: string;
   statusCategory: JiraStatusCategory;
   issueTypeName: string;
+  issueTypeIconUrl?: string;
   assigneeName?: string;
   originalEstimateSeconds: number;
   timeSpentSeconds: number;
@@ -16,6 +17,7 @@ export interface JiraRemoteWorklog {
   issueKey: string;
   issueSummary: string;
   issueTypeName: string;
+  issueTypeIconUrl?: string;
   authorId: string;
   authorName: string;
   startedAt: string;
@@ -52,7 +54,7 @@ export interface JiraRawIssue {
   fields: {
     summary?: string;
     status?: { name: string; statusCategory?: { key: string } };
-    issuetype?: { name: string };
+    issuetype?: { name: string; iconUrl?: string };
     assignee?: JiraRawUser | null;
     timeoriginalestimate?: number | null;
     timespent?: number | null;

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Timesheet — Apontamento de horas no Jira",
   "short_name": "Timesheet",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Cronometre, organize e envie seus worklogs ao Jira. Tudo fica salvo apenas no seu navegador.",
   "minimum_chrome_version": "116",
   "icons": {
@@ -32,6 +32,7 @@
     }
   },
   "permissions": ["storage", "alarms", "idle", "scripting"],
+  "host_permissions": ["https://raw.githubusercontent.com/*"],
   "optional_host_permissions": ["https://*/*", "http://*/*"],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'"

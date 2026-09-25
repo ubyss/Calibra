@@ -126,6 +126,37 @@
   border-top: 1px solid var(--color-border);
 }
 
+.appNavigation__themeSwitch {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+}
+
+.appNavigation__themeOption {
+  display: grid;
+  place-items: center;
+  min-height: var(--touch-target);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.appNavigation__themeOption svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.appNavigation__themeOption--active {
+  background: var(--color-surface);
+  color: var(--color-accent);
+  box-shadow: var(--shadow-soft);
+}
+
 .appNavigation__account {
   display: flex;
   align-items: center;

@@ -44,7 +44,7 @@
   bottom: 0;
   left: 0;
   width: min(86vw, 18rem);
-  background: var(--color-canvas);
+  background: var(--color-surface-muted);
   box-shadow: var(--shadow-float);
 }
 
@@ -78,9 +78,12 @@
     display: block;
     height: 100vh;
     border-right: 1px solid var(--color-border);
+    background: var(--color-surface-muted);
   }
 
   .appShell__main {
+    min-width: 0;
     padding: var(--space-7) var(--space-7) var(--space-7);
+    background: var(--color-canvas);
   }
 }

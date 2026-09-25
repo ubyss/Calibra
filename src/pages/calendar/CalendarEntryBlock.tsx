@@ -1,10 +1,11 @@
 import { addSeconds, format } from 'date-fns';
-import { Bug, Copy, Layers, SquarePlus, Zap } from 'lucide-react';
+import { Copy } from 'lucide-react';
 import { motion } from 'motion/react';
-import { type KeyboardEvent, type PointerEvent, type ReactNode, useRef, useState } from 'react';
+import { type KeyboardEvent, type PointerEvent, useRef, useState } from 'react';
 
+import { IssueTypeIcon } from '@/components/issue/IssueTypeIcon';
 import { formatDuration } from '@/utils/duration';
-import { type IssueTypeMark, resolveIssueTypeMark } from '@/utils/issue-type';
+import { resolveIssueTypeMark } from '@/utils/issue-type';
 import { classNames } from '@/utils/misc';
 
 import {
@@ -52,25 +53,6 @@ interface DragSession {
 
 const DRAG_THRESHOLD_PX = 4;
 const CARD_GAP_PX = 2;
-
-function IssueTypeIcon({ mark }: { mark: IssueTypeMark }): ReactNode {
-  switch (mark) {
-    case 'bug':
-      return <Bug size={10} strokeWidth={2.5} aria-hidden />;
-    case 'story':
-      return <Zap size={10} strokeWidth={2.5} aria-hidden />;
-    case 'task':
-      return <SquarePlus size={10} strokeWidth={2.5} aria-hidden />;
-    case 'epic':
-      return <Layers size={10} strokeWidth={2.5} aria-hidden />;
-    case 'default':
-      return <span aria-hidden>•</span>;
-    default: {
-      const exhaustive: never = mark;
-      return exhaustive;
-    }
-  }
-}
 
 export function CalendarEntryBlock({
   entry,
@@ -171,9 +153,9 @@ export function CalendarEntryBlock({
       return;
     }
     if (!drag.hasMoved) {
-      if (drag.mode === 'move') {
-        onOpen(entry);
-      }
+      // Clique sem arrastar abre o editor — inclusive se o hit caiu no handle de resize
+      // (comum em blocos de 15 min, onde os handles cobrem quase toda a altura).
+      onOpen(entry);
       return;
     }
     const { minutesDelta, dayDelta, durationMinutes: nextDuration } = drag.change;
@@ -263,7 +245,7 @@ export function CalendarEntryBlock({
           }}
           onClick={(event) => event.stopPropagation()}
         >
-          <Copy size={12} aria-hidden strokeWidth={2.2} />
+          <Copy size={isCompact ? 11 : 12} aria-hidden strokeWidth={2.2} />
         </button>
 
         <div className={styles.calendarEntryBlock__issueRow}>
@@ -274,7 +256,7 @@ export function CalendarEntryBlock({
             )}
             title={issue.issueTypeName || 'Tipo da issue'}
           >
-            <IssueTypeIcon mark={typeMark} />
+            <IssueTypeIcon mark={typeMark} iconUrl={issue.issueTypeIconUrl} label={issue.issueTypeName} />
           </span>
           {issueKeyNode}
           {isCompact && (
@@ -294,16 +276,18 @@ export function CalendarEntryBlock({
           </>
         )}
 
-        <span
-          className={classNames(styles.calendarEntryBlock__resizeHandle, styles['calendarEntryBlock__resizeHandle--start'])}
-          onPointerDown={(event) => handlePointerDown(event, 'resize-start')}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerUp}
-          onClick={(event) => event.stopPropagation()}
-          title="Arraste para ajustar o início"
-          aria-hidden
-        />
+        {!isCompact && (
+          <span
+            className={classNames(styles.calendarEntryBlock__resizeHandle, styles['calendarEntryBlock__resizeHandle--start'])}
+            onPointerDown={(event) => handlePointerDown(event, 'resize-start')}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            onClick={(event) => event.stopPropagation()}
+            title="Arraste para ajustar o início"
+            aria-hidden
+          />
+        )}
         <span
           className={classNames(styles.calendarEntryBlock__resizeHandle, styles['calendarEntryBlock__resizeHandle--end'])}
           onPointerDown={(event) => handlePointerDown(event, 'resize-end')}

@@ -2,6 +2,7 @@ import { Clock3, ExternalLink, UploadCloud } from 'lucide-react';
 import { motion, MotionConfig } from 'motion/react';
 
 import { TimerPanel } from '@/components/timer/TimerPanel';
+import { UpdateAvailableBanner } from '@/components/update/UpdateAvailableBanner';
 import { ActionButton } from '@/components/ui/ActionButton';
 import { ProgressMeter } from '@/components/ui/ProgressMeter';
 import { ToastProvider, useToast } from '@/components/ui/ToastProvider';
@@ -104,6 +105,7 @@ export function PopupApp() {
     <MotionConfig reducedMotion="user">
       <ToastProvider>
         <div className={styles.popupApp}>
+          <UpdateAvailableBanner />
           <header className={styles.popupApp__header}>
             <span className={styles.popupApp__brand}>
               <span className={styles.popupApp__logo}>

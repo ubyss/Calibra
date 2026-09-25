@@ -15,7 +15,7 @@ export async function createWorklog(draft: WorklogDraft): Promise<Worklog> {
   const now = new Date().toISOString();
   const worklog: Worklog = { ...draft, id: createId(), status: 'pending', createdAt: now, updatedAt: now };
   await updateStorage('worklogs', (worklogs) => [...worklogs, worklog]);
-  return worklog;
+  return maybeAutoUpload(worklog);
 }
 
 /** Importa um worklog que só existia no Jira para a base local, permitindo editar/redimensionar. */
@@ -31,6 +31,7 @@ export async function adoptRemoteWorklog(remote: JiraRemoteWorklog): Promise<Wor
     issueKey: remote.issueKey,
     issueSummary: remote.issueSummary,
     issueTypeName: remote.issueTypeName,
+    issueTypeIconUrl: remote.issueTypeIconUrl,
     startedAt: remote.startedAt,
     durationSeconds: remote.durationSeconds,
     comment: remote.comment,
@@ -55,12 +56,27 @@ export async function createWorklogs(drafts: WorklogDraft[]): Promise<void> {
   await updateStorage('worklogs', (worklogs) => [...worklogs, ...created]);
 }
 
-export async function updateWorklog(id: string, changes: Partial<WorklogDraft>): Promise<void> {
+export async function updateWorklog(id: string, changes: Partial<WorklogDraft>): Promise<Worklog> {
   await updateStorage('worklogs', (worklogs) =>
     worklogs.map((worklog): Worklog =>
       worklog.id === id ? { ...worklog, ...changes, status: 'pending', updatedAt: new Date().toISOString() } : worklog,
     ),
   );
+  const updated = (await readStorage('worklogs')).find((worklog) => worklog.id === id);
+  if (!updated) {
+    throw new Error('Worklog não encontrado.');
+  }
+  return maybeAutoUpload(updated);
+}
+
+async function maybeAutoUpload(worklog: Worklog): Promise<Worklog> {
+  const settings = await readStorage('settings');
+  if (!settings.autoUploadWorklogs) {
+    return worklog;
+  }
+
+  await uploadWorklogs([worklog.id]);
+  return (await readStorage('worklogs')).find((item) => item.id === worklog.id) ?? worklog;
 }
 
 export async function deleteWorklog(worklog: Worklog): Promise<void> {

@@ -1,8 +1,7 @@
 import { addDays, addMinutes, addWeeks, endOfDay, isSameDay, parseISO, startOfDay } from 'date-fns';
-import { CalendarDays, ChevronLeft, ChevronRight, Cloud, PanelLeft, Plus, Table2, UploadCloud } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, Send, Table2, UploadCloud } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { PageHeader } from '@/components/layout/PageHeader';
 import { ActionButton } from '@/components/ui/ActionButton';
 import { ErrorNotice } from '@/components/ui/FeedbackStates';
 import { SurfacePanel } from '@/components/ui/SurfacePanel';
@@ -30,7 +29,7 @@ import {
   VISIBLE_START_HOUR,
 } from './calendar-model';
 import type { EntryChange } from './CalendarEntryBlock';
-import { CalendarGrid } from './CalendarGrid';
+import { CalendarGrid, type CalendarDropPreview } from './CalendarGrid';
 import styles from './CalendarPage.module.css';
 import { TimesheetPanel } from './TimesheetPanel';
 import { WorkItemsSidebar } from './WorkItemsSidebar';
@@ -60,7 +59,7 @@ function resolveDropStart(clientX: number, clientY: number, daysByKey: Map<strin
   return start;
 }
 
-export function CalendarPage() {
+export function CalendarPanel() {
   const { notify } = useToast();
   const { openWorklogEditor } = useWorklogEditor();
   const { upload, isUploading } = useWorklogUpload();
@@ -69,9 +68,7 @@ export function CalendarPage() {
   const { value: worklogs } = useStoredValue('worklogs');
   const isCompactLayout = useMediaQuery('(max-width: 600px)');
   const [referenceDate, setReferenceDate] = useState(() => new Date());
-  const [shouldShowRemote, setShouldShowRemote] = useState(true);
   const [selectedDay, setSelectedDay] = useState(() => toDateKey(new Date()));
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isTimesheetOpen, setIsTimesheetOpen] = useState(false);
   const [copySession, setCopySession] = useState<CopySession | null>(null);
   const copySessionRef = useRef<CopySession | null>(null);
@@ -94,7 +91,7 @@ export function CalendarPage() {
   const remote = useAsync(
     () => fetchRemoteWorklogs(account ? [account.user] : [], weekStart, weekEnd),
     [weekKey, account?.user.id],
-    shouldShowRemote && Boolean(account),
+    Boolean(account),
   );
 
   const weekWorklogs = useMemo(
@@ -107,8 +104,8 @@ export function CalendarPage() {
   );
 
   const entriesByDay = useMemo(
-    () => groupEntriesByDay(buildCalendarEntries(weekWorklogs, shouldShowRemote ? remote.data ?? [] : [])),
-    [weekWorklogs, remote.data, shouldShowRemote],
+    () => groupEntriesByDay(buildCalendarEntries(weekWorklogs, remote.data ?? [])),
+    [weekWorklogs, remote.data],
   );
 
   const visibleDays = useMemo(
@@ -116,6 +113,24 @@ export function CalendarPage() {
     [isCompactLayout, displayDays, selectedDay],
   );
   const pendingIds = weekWorklogs.filter((worklog) => worklog.status === 'pending').map((worklog) => worklog.id);
+
+  const dropPreview = useMemo((): CalendarDropPreview | null => {
+    if (!copySession) {
+      return null;
+    }
+    const start = resolveDropStart(copySession.pointer.x, copySession.pointer.y, daysByKey);
+    if (!start) {
+      return null;
+    }
+    return { start, draft: copySession.draft };
+  }, [copySession, daysByKey]);
+
+  const toggleAutoUpload = (): void => {
+    void updateStorage('settings', (current) => ({
+      ...current,
+      autoUploadWorklogs: !current.autoUploadWorklogs,
+    }));
+  };
 
   useEffect(() => {
     if (!isCopying) {
@@ -130,22 +145,35 @@ export function CalendarPage() {
 
     const handlePointerUp = (event: PointerEvent): void => {
       const session = copySessionRef.current;
-      setCopySession(null);
       if (!session) {
         return;
       }
 
       const start = resolveDropStart(event.clientX, event.clientY, daysByKey);
       if (!start) {
+        setCopySession(null);
         return;
       }
+
+      suppressCreateRef.current = true;
+      window.setTimeout(() => {
+        suppressCreateRef.current = false;
+      }, 0);
+      setCopySession(null);
 
       void createWorklog({
         ...session.draft,
         startedAt: start.toISOString(),
       })
         .then((worklog) => {
-          notify(`Colado ${worklog.issueKey} · ${formatDuration(worklog.durationSeconds)}.`);
+          notify(
+            settings.autoUploadWorklogs
+              ? 'Worklog salvo.'
+              : `Colado ${worklog.issueKey} · ${formatDuration(worklog.durationSeconds)}.`,
+          );
+          if (settings.autoUploadWorklogs) {
+            remote.reload();
+          }
         })
         .catch((error: unknown) => {
           notify(getErrorMessage(error), 'error');
@@ -167,7 +195,7 @@ export function CalendarPage() {
       window.removeEventListener('pointerup', handlePointerUp);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isCopying, daysByKey, notify]);
+  }, [isCopying, daysByKey, notify, settings.autoUploadWorklogs, remote.reload]);
 
   const shiftWeek = (weeks: number): void => {
     const next = weeks === 0 ? new Date() : addWeeks(referenceDate, weeks);
@@ -199,6 +227,11 @@ export function CalendarPage() {
         startedAt: nextStart.toISOString(),
         durationSeconds: change.durationMinutes * 60,
       });
+      if (settings.autoUploadWorklogs) {
+        notify('Worklog salvo.');
+        remote.reload();
+        return;
+      }
       if (worklog.jiraWorklogId || entry.kind === 'remote') {
         notify('Alterado localmente. Envie para atualizar no Jira.', 'info');
       }
@@ -213,6 +246,7 @@ export function CalendarPage() {
         issueKey: issue.key,
         issueSummary: issue.summary,
         issueTypeName: issue.issueTypeName,
+        issueTypeIconUrl: issue.issueTypeIconUrl,
         durationSeconds: entry.durationSeconds,
         comment: issue.comment,
       },
@@ -221,7 +255,7 @@ export function CalendarPage() {
   };
 
   const handleCreate = (start: Date): void => {
-    if (copySession) {
+    if (copySession || suppressCreateRef.current) {
       return;
     }
     openWorklogEditor({ draft: { startedAt: start.toISOString(), durationSeconds: 3600 } });
@@ -232,7 +266,23 @@ export function CalendarPage() {
       draft: {
         issueKey: issue.key,
         issueSummary: issue.summary,
+        issueTypeName: issue.issueTypeName,
+        issueTypeIconUrl: issue.issueTypeIconUrl,
       },
+    });
+  };
+
+  const handleDragIssue = (issue: JiraIssue, pointer: { x: number; y: number }): void => {
+    setCopySession({
+      draft: {
+        issueKey: issue.key,
+        issueSummary: issue.summary,
+        issueTypeName: issue.issueTypeName,
+        issueTypeIconUrl: issue.issueTypeIconUrl,
+        durationSeconds: 30 * 60,
+        comment: '',
+      },
+      pointer,
     });
   };
 
@@ -242,54 +292,27 @@ export function CalendarPage() {
 
   return (
     <>
-      <PageHeader
-        title="Calendário"
-        description="Clique no card para editar, no código da issue para abrir no Jira. Arraste as bordas para redimensionar."
-        actions={
-          <>
-            <ActionButton
-              icon={UploadCloud}
-              disabled={pendingIds.length === 0}
-              isLoading={isUploading}
-              onClick={() => void upload(pendingIds)}
-            >
-              Enviar semana{pendingIds.length > 0 ? ` (${pendingIds.length})` : ''}
-            </ActionButton>
-            <ActionButton variant="primary" icon={Plus} onClick={() => openWorklogEditor()}>
-              Novo
-            </ActionButton>
-          </>
-        }
-      />
-
       <div
         className={classNames(
           styles.calendarPage__layout,
-          isSidebarOpen && styles['calendarPage__layout--withSidebar'],
           copySession && styles['calendarPage__layout--copying'],
         )}
       >
-        {isSidebarOpen && (
-          <div className={styles.calendarPage__sidebar}>
+        <SurfacePanel
+          className={styles.calendarPage__main}
+          title="Calendário"
+          subtitle="Clique no card para editar, no código da issue para abrir no Jira. Arraste as bordas para redimensionar."
+        >
+          <div className={styles.calendarPage__tools}>
             <WorkItemsSidebar
-              isCollapsible
-              onCollapse={() => setIsSidebarOpen(false)}
+              variant="inline"
               onSelectIssue={handleSelectIssue}
+              onDragIssue={handleDragIssue}
             />
           </div>
-        )}
 
-        <SurfacePanel className={styles.calendarPage__main}>
           <div className={styles.calendarPage__toolbar}>
             <div className={styles.calendarPage__navigation}>
-              {!isSidebarOpen && (
-                <ActionButton
-                  variant="ghost"
-                  icon={PanelLeft}
-                  label="Mostrar itens de trabalho"
-                  onClick={() => setIsSidebarOpen(true)}
-                />
-              )}
               <ActionButton variant="ghost" icon={ChevronLeft} label="Semana anterior" onClick={() => shiftWeek(-1)} />
               <ActionButton isCompact onClick={() => shiftWeek(0)}>
                 Hoje
@@ -298,32 +321,39 @@ export function CalendarPage() {
               <span className={styles.calendarPage__range}>{formatMonthRange(weekDays[0], weekDays[6])}</span>
             </div>
             <div className={styles.calendarPage__toolbarActions}>
-              {copySession && (
-                <span className={styles.calendarPage__copyHint}>
-                  Solte no calendário para colar · Esc cancela
-                </span>
-              )}
+              <div className={styles.calendarPage__viewToggles} role="group" aria-label="Opções de visualização">
+                <ActionButton
+                  variant="secondary"
+                  isCompact
+                  icon={CalendarDays}
+                  aria-pressed={!settings.hideWeekends}
+                  onClick={toggleHideWeekends}
+                >
+                  Fim de semana
+                </ActionButton>
+              </div>
+              <span className={styles.calendarPage__toolbarDivider} aria-hidden />
               <ActionButton
-                variant="ghost"
+                variant="secondary"
                 isCompact
-                icon={CalendarDays}
-                aria-pressed={settings.hideWeekends}
-                onClick={toggleHideWeekends}
+                icon={UploadCloud}
+                disabled={pendingIds.length === 0}
+                isLoading={isUploading}
+                onClick={() => void upload(pendingIds)}
               >
-                {settings.hideWeekends ? 'Mostrar fim de semana' : 'Ocultar fim de semana'}
+                Enviar semana{pendingIds.length > 0 ? ` (${pendingIds.length})` : ''}
               </ActionButton>
-              <ActionButton variant="ghost" isCompact icon={Table2} onClick={() => setIsTimesheetOpen(true)}>
+              <ActionButton
+                variant="secondary"
+                isCompact
+                icon={Send}
+                aria-pressed={settings.autoUploadWorklogs}
+                onClick={toggleAutoUpload}
+              >
+                Envio automático
+              </ActionButton>
+              <ActionButton variant="secondary" isCompact icon={Table2} onClick={() => setIsTimesheetOpen(true)}>
                 Timesheet
-              </ActionButton>
-              <ActionButton
-                variant="ghost"
-                isCompact
-                icon={Cloud}
-                aria-pressed={shouldShowRemote}
-                isLoading={shouldShowRemote && remote.isLoading}
-                onClick={() => setShouldShowRemote((current) => !current)}
-              >
-                Worklogs do Jira
               </ActionButton>
             </div>
           </div>
@@ -352,7 +382,7 @@ export function CalendarPage() {
             </div>
           )}
 
-          {remote.error && shouldShowRemote && <ErrorNotice message={remote.error} />}
+          {remote.error && <ErrorNotice message={remote.error} />}
 
           <CalendarGrid
             days={visibleDays}
@@ -360,6 +390,7 @@ export function CalendarPage() {
             settings={settings}
             issueBaseUrl={account?.baseUrl}
             isCopyMode={Boolean(copySession)}
+            dropPreview={dropPreview}
             onCreate={handleCreate}
             onOpen={(entry) => void handleOpen(entry)}
             onCopy={handleCopy}
@@ -391,7 +422,7 @@ export function CalendarPage() {
         weekTo={weekTo}
         referenceDate={referenceDate}
         worklogs={worklogs}
-        remoteWorklogs={shouldShowRemote ? remote.data ?? [] : []}
+        remoteWorklogs={remote.data ?? []}
         settings={settings}
         onClose={() => setIsTimesheetOpen(false)}
       />

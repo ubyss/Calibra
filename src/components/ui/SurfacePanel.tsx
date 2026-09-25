@@ -1,4 +1,3 @@
-import { motion } from 'motion/react';
 import type { ReactNode } from 'react';
 
 import { classNames } from '@/utils/misc';
@@ -16,13 +15,7 @@ interface SurfacePanelProps {
 
 export function SurfacePanel({ title, subtitle, actions, isFlush = false, className, children }: SurfacePanelProps) {
   return (
-    <motion.section
-      layout="position"
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: [0.2, 0.8, 0.2, 1] }}
-      className={classNames(styles.surfacePanel, isFlush && styles['surfacePanel--flush'], className)}
-    >
+    <section className={classNames(styles.surfacePanel, isFlush && styles['surfacePanel--flush'], className)}>
       {(title || actions) && (
         <header className={styles.surfacePanel__header}>
           <div className={styles.surfacePanel__heading}>
@@ -33,6 +26,6 @@ export function SurfacePanel({ title, subtitle, actions, isFlush = false, classN
         </header>
       )}
       {children}
-    </motion.section>
+    </section>
   );
 }

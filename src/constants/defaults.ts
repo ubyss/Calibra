@@ -12,6 +12,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   pauseOnLock: true,
   showTimerOnJira: true,
   hideWeekends: true,
+  autoUploadWorklogs: true,
 };
 
 export const STORAGE_DEFAULTS: StorageSchema = {

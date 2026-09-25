@@ -1,9 +1,11 @@
-import { Clock3 } from 'lucide-react';
+import { Clock3, Monitor, Moon, Sun } from 'lucide-react';
 import { motion } from 'motion/react';
 import { NavLink } from 'react-router-dom';
 
 import { NAVIGATION_SECTIONS, type NavigationLink, SETTINGS_LINK } from '@/constants/navigation';
 import { useStoredValue } from '@/hooks/useStoredValue';
+import { updateStorage } from '@/services/storage';
+import type { ThemePreference } from '@/types/domain';
 import { classNames, getInitials } from '@/utils/misc';
 
 import styles from './AppNavigation.module.css';
@@ -54,10 +56,21 @@ function NavigationItem({
   );
 }
 
+const THEME_OPTIONS: { value: ThemePreference; label: string; icon: typeof Sun }[] = [
+  { value: 'system', label: 'Sistema', icon: Monitor },
+  { value: 'light', label: 'Claro', icon: Sun },
+  { value: 'dark', label: 'Escuro', icon: Moon },
+];
+
 export function AppNavigation({ highlightId, onNavigate }: AppNavigationProps) {
   const { value: account } = useStoredValue('account');
+  const { value: settings } = useStoredValue('settings');
   const { value: worklogs } = useStoredValue('worklogs');
   const pendingCount = worklogs.filter((worklog) => worklog.status === 'pending').length;
+
+  const handleThemeChange = (theme: ThemePreference): void => {
+    void updateStorage('settings', (current) => ({ ...current, theme }));
+  };
 
   return (
     <nav className={styles.appNavigation} aria-label="Navegação principal">
@@ -90,6 +103,29 @@ export function AppNavigation({ highlightId, onNavigate }: AppNavigationProps) {
       </div>
 
       <div className={styles.appNavigation__footer}>
+        <div className={styles.appNavigation__themeSwitch} role="radiogroup" aria-label="Tema">
+          {THEME_OPTIONS.map((option) => {
+            const Icon = option.icon;
+            const isActive = settings.theme === option.value;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                role="radio"
+                aria-checked={isActive}
+                aria-label={option.label}
+                title={option.label}
+                className={classNames(
+                  styles.appNavigation__themeOption,
+                  isActive && styles['appNavigation__themeOption--active'],
+                )}
+                onClick={() => handleThemeChange(option.value)}
+              >
+                <Icon aria-hidden strokeWidth={2.2} />
+              </button>
+            );
+          })}
+        </div>
         <NavigationItem link={SETTINGS_LINK} highlightId={highlightId} onNavigate={onNavigate} />
         {account && (
           <div className={styles.appNavigation__account}>

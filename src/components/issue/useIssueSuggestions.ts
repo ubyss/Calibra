@@ -10,6 +10,8 @@ import { quoteJql } from '@/services/jira-mappers';
 export interface IssueSelection {
   key: string;
   summary: string;
+  issueTypeName?: string;
+  issueTypeIconUrl?: string;
 }
 
 const RECENT_LIMIT = 6;
@@ -29,11 +31,16 @@ async function searchRemoteIssues(query: string): Promise<IssueSelection[]> {
   const normalizedKey = query.toUpperCase();
   if (ISSUE_KEY_PATTERN.test(normalizedKey)) {
     const issue = await client.getIssue(normalizedKey);
-    return [{ key: issue.key, summary: issue.summary }];
+    return [{ key: issue.key, summary: issue.summary, issueTypeName: issue.issueTypeName, issueTypeIconUrl: issue.issueTypeIconUrl }];
   }
 
   const issues = await client.searchIssues(`text ~ ${quoteJql(query)} ORDER BY updated DESC`, 8);
-  return issues.map((issue) => ({ key: issue.key, summary: issue.summary }));
+  return issues.map((issue) => ({
+    key: issue.key,
+    summary: issue.summary,
+    issueTypeName: issue.issueTypeName,
+    issueTypeIconUrl: issue.issueTypeIconUrl,
+  }));
 }
 
 export function useIssueSuggestions(query: string): IssueSuggestions {
@@ -48,7 +55,12 @@ export function useIssueSuggestions(query: string): IssueSuggestions {
       .sort((first, second) => second.updatedAt.localeCompare(first.updatedAt))
       .forEach((worklog) => {
         if (!byKey.has(worklog.issueKey)) {
-          byKey.set(worklog.issueKey, { key: worklog.issueKey, summary: worklog.issueSummary ?? '' });
+          byKey.set(worklog.issueKey, {
+            key: worklog.issueKey,
+            summary: worklog.issueSummary ?? '',
+            issueTypeName: worklog.issueTypeName,
+            issueTypeIconUrl: worklog.issueTypeIconUrl,
+          });
         }
       });
     return [...byKey.values()];

@@ -33,6 +33,7 @@ export interface Worklog {
   issueKey: string;
   issueSummary?: string;
   issueTypeName?: string;
+  issueTypeIconUrl?: string;
   startedAt: string;
   durationSeconds: number;
   comment: string;
@@ -44,7 +45,7 @@ export interface Worklog {
 
 export type WorklogDraft = Pick<
   Worklog,
-  'issueKey' | 'issueSummary' | 'issueTypeName' | 'startedAt' | 'durationSeconds' | 'comment'
+  'issueKey' | 'issueSummary' | 'issueTypeName' | 'issueTypeIconUrl' | 'startedAt' | 'durationSeconds' | 'comment'
 >;
 
 export interface RunningTimer {
@@ -81,6 +82,7 @@ export interface AppSettings {
   pauseOnLock: boolean;
   showTimerOnJira: boolean;
   hideWeekends: boolean;
+  autoUploadWorklogs: boolean;
 }
 
 export interface StorageSchema {

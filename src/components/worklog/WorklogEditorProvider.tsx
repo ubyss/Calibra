@@ -4,6 +4,7 @@ import { createContext, type ReactNode, useCallback, useContext, useMemo, useSta
 import { ActionButton } from '@/components/ui/ActionButton';
 import { ModalDialog } from '@/components/ui/ModalDialog';
 import { useToast } from '@/components/ui/ToastProvider';
+import { useStoredValue } from '@/hooks/useStoredValue';
 import { createWorklog, deleteWorklog, updateWorklog, uploadWorklogs } from '@/services/worklog-service';
 import type { Worklog, WorklogDraft } from '@/types/domain';
 import { getErrorMessage } from '@/utils/misc';
@@ -30,6 +31,7 @@ const WorklogEditorContext = createContext<WorklogEditorApi | null>(null);
 
 export function WorklogEditorProvider({ children }: { children: ReactNode }) {
   const { notify } = useToast();
+  const { value: settings } = useStoredValue('settings');
   const [isOpen, setIsOpen] = useState(false);
   const [editingWorklog, setEditingWorklog] = useState<Worklog | null>(null);
   const [values, setValues] = useState<WorklogFormValues>(() => toFormValues({}));
@@ -68,6 +70,8 @@ export function WorklogEditorProvider({ children }: { children: ReactNode }) {
           return;
         }
         notify('Worklog enviado ao Jira.');
+      } else if (settings.autoUploadWorklogs) {
+        notify('Worklog salvo.');
       } else {
         notify(editingWorklog?.jiraWorklogId ? 'Alteração salva. Envie para atualizar no Jira.' : 'Worklog salvo.');
       }

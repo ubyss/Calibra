@@ -4,8 +4,10 @@ import { type KeyboardEvent, useId, useState } from 'react';
 
 import { ActionButton } from '@/components/ui/ActionButton';
 import { TextInput } from '@/components/ui/FormField';
+import { resolveIssueTypeMark } from '@/utils/issue-type';
 import { classNames } from '@/utils/misc';
 
+import { IssueTypeIcon } from './IssueTypeIcon';
 import styles from './IssuePicker.module.css';
 import { type IssueSelection, useIssueSuggestions } from './useIssueSuggestions';
 
@@ -47,12 +49,16 @@ export function IssuePicker({ value, onChange, inputId, placeholder = 'Busque po
   };
 
   if (value) {
+    const typeMark = resolveIssueTypeMark(value.issueTypeName);
     return (
       <motion.div
         className={styles.issuePicker__selected}
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
       >
+        <span className={styles.issuePicker__selectedType} aria-hidden>
+          <IssueTypeIcon mark={typeMark} iconUrl={value.issueTypeIconUrl} label={value.issueTypeName} />
+        </span>
         <span className={styles.issuePicker__selectedText}>
           <span className={styles.issuePicker__optionKey}>{value.key}</span>
           <span className={styles.issuePicker__optionSummary}>{value.summary || 'Sem título'}</span>
@@ -99,25 +105,31 @@ export function IssuePicker({ value, onChange, inputId, placeholder = 'Busque po
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.15 }}
           >
-            {suggestions.map((issue, index) => (
-              <li
-                key={issue.key}
-                role="option"
-                aria-selected={index === highlightedIndex}
-                className={classNames(
-                  styles.issuePicker__option,
-                  index === highlightedIndex && styles['issuePicker__option--highlighted'],
-                )}
-                onMouseEnter={() => setHighlightedIndex(index)}
-                onMouseDown={(event) => {
-                  event.preventDefault();
-                  selectIssue(issue);
-                }}
-              >
-                <span className={styles.issuePicker__optionKey}>{issue.key}</span>
-                <span className={styles.issuePicker__optionSummary}>{issue.summary}</span>
-              </li>
-            ))}
+            {suggestions.map((issue, index) => {
+              const typeMark = resolveIssueTypeMark(issue.issueTypeName);
+              return (
+                <li
+                  key={issue.key}
+                  role="option"
+                  aria-selected={index === highlightedIndex}
+                  className={classNames(
+                    styles.issuePicker__option,
+                    index === highlightedIndex && styles['issuePicker__option--highlighted'],
+                  )}
+                  onMouseEnter={() => setHighlightedIndex(index)}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    selectIssue(issue);
+                  }}
+                >
+                  <span className={styles.issuePicker__optionType} aria-hidden>
+                    <IssueTypeIcon mark={typeMark} iconUrl={issue.issueTypeIconUrl} label={issue.issueTypeName} />
+                  </span>
+                  <span className={styles.issuePicker__optionKey}>{issue.key}</span>
+                  <span className={styles.issuePicker__optionSummary}>{issue.summary}</span>
+                </li>
+              );
+            })}
             {showNotice && (
               <li className={styles.issuePicker__notice}>
                 {isSearching ? 'Buscando no Jira…' : error ?? 'Nenhuma issue encontrada.'}

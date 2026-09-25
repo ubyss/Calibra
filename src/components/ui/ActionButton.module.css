@@ -24,13 +24,13 @@
 }
 
 .actionButton--primary {
-  background: var(--color-accent);
-  color: var(--color-on-accent);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15) inset, 0 0.25rem 0.75rem rgba(91, 91, 214, 0.25);
+  background: var(--color-text);
+  color: var(--color-canvas);
+  box-shadow: none;
 }
 
 .actionButton--primary:hover:not(:disabled) {
-  background: var(--color-accent-hover);
+  background: color-mix(in srgb, var(--color-text) 88%, var(--color-canvas));
 }
 
 .actionButton--secondary {
@@ -64,13 +64,40 @@
   color: var(--color-on-accent);
 }
 
+/* Toggle: indicador de status à direita, vazado quando desligado e preenchido quando ligado */
+.actionButton[aria-pressed]::after {
+  content: '';
+  flex-shrink: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  border: 1.5px solid var(--color-text-subtle);
+  border-radius: 50%;
+  transition:
+    background-color 160ms var(--ease-out),
+    border-color 160ms var(--ease-out),
+    box-shadow 160ms var(--ease-out);
+}
+
+.actionButton[aria-pressed='false'] {
+  color: var(--color-text-muted);
+}
+
 .actionButton[aria-pressed='true'] {
   background: var(--color-accent-soft);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   color: var(--color-accent-text);
 }
 
-.actionButton[aria-pressed='true'] .actionButton__icon {
-  fill: color-mix(in srgb, currentColor 25%, transparent);
+.actionButton[aria-pressed='true']::after {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 22%, transparent);
+}
+
+.actionButton[aria-pressed='true']:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-accent-soft) 70%, var(--color-accent) 12%);
+  border-color: var(--color-accent);
+  color: var(--color-accent-text);
 }
 
 .actionButton--compact {

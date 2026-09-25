@@ -38,6 +38,7 @@ export function mapIssue(issue: JiraRawIssue): JiraIssue {
     statusName: fields.status?.name ?? '',
     statusCategory: mapStatusCategory(fields.status?.statusCategory?.key),
     issueTypeName: fields.issuetype?.name ?? '',
+    issueTypeIconUrl: fields.issuetype?.iconUrl,
     assigneeName: fields.assignee?.displayName,
     originalEstimateSeconds: fields.timeoriginalestimate ?? 0,
     timeSpentSeconds: fields.timespent ?? 0,
@@ -46,7 +47,7 @@ export function mapIssue(issue: JiraRawIssue): JiraIssue {
 
 export function mapWorklog(
   worklog: JiraRawWorklog,
-  issue: Pick<JiraIssue, 'key' | 'summary' | 'issueTypeName'>,
+  issue: Pick<JiraIssue, 'key' | 'summary' | 'issueTypeName' | 'issueTypeIconUrl'>,
   deployment: JiraDeployment,
 ): JiraRemoteWorklog {
   return {
@@ -54,6 +55,7 @@ export function mapWorklog(
     issueKey: issue.key,
     issueSummary: issue.summary,
     issueTypeName: issue.issueTypeName,
+    issueTypeIconUrl: issue.issueTypeIconUrl,
     authorId: worklog.author ? getUserId(worklog.author, deployment) : '',
     authorName: worklog.author?.displayName ?? 'Desconhecido',
     startedAt: new Date(worklog.started).toISOString(),

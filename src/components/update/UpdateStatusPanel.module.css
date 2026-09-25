@@ -1,0 +1,47 @@
+.updateStatusPanel__versions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.updateStatusPanel__versions dt {
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.updateStatusPanel__versions dd {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.updateStatusPanel__notice,
+.updateStatusPanel__error {
+  margin-top: var(--space-3);
+  font-size: 0.875rem;
+}
+
+.updateStatusPanel__notice {
+  color: var(--color-warning);
+}
+
+.updateStatusPanel__error {
+  color: var(--color-danger);
+}
+
+.updateStatusPanel__link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}

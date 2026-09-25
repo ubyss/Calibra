@@ -1,6 +1,7 @@
-import { Bug, ListFilter, PanelLeftClose, Star } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { ListFilter, PanelLeftClose, Star } from 'lucide-react';
+import { type PointerEvent as ReactPointerEvent, useEffect, useMemo, useRef, useState } from 'react';
 
+import { IssueTypeIcon } from '@/components/issue/IssueTypeIcon';
 import { ActionButton } from '@/components/ui/ActionButton';
 import { ErrorNotice, LoadingSkeleton } from '@/components/ui/FeedbackStates';
 import { TextInput } from '@/components/ui/FormField';
@@ -16,17 +17,21 @@ import type { JiraIssue, JiraStatusCategory } from '@/types/jira';
 import { resolveIssueTypeMark } from '@/utils/issue-type';
 import { classNames } from '@/utils/misc';
 
+import { projectColorFromKey } from './calendar-model';
 import styles from './WorkItemsSidebar.module.css';
 
 type WorkItemsTab = 'recent' | 'assigned' | 'favorites';
 
 type WorkItemsSidebarProps = {
   isCollapsible?: boolean;
+  variant?: 'sidebar' | 'inline';
   onCollapse?: () => void;
   onSelectIssue: (issue: JiraIssue) => void;
+  onDragIssue: (issue: JiraIssue, pointer: { x: number; y: number }) => void;
 };
 
 const STATUS_WITHOUT_LABEL = 'Sem status';
+const DRAG_THRESHOLD_PX = 4;
 
 const STATUS_TONES: Record<JiraStatusCategory, StatusTagTone> = {
   new: 'neutral',
@@ -35,8 +40,8 @@ const STATUS_TONES: Record<JiraStatusCategory, StatusTagTone> = {
 };
 
 const TAB_OPTIONS: ReadonlyArray<{ id: WorkItemsTab; label: string }> = [
-  { id: 'recent', label: 'Recentes' },
   { id: 'assigned', label: 'Atribuídas' },
+  { id: 'recent', label: 'Recentes' },
   { id: 'favorites', label: 'Favoritas' },
 ];
 
@@ -96,13 +101,117 @@ async function hydrateFavoriteIssues(issueKeys: string[], knownIssues: JiraIssue
   return issueKeys.map((key) => knownByKey.get(key)).filter((issue): issue is JiraIssue => Boolean(issue));
 }
 
-export function WorkItemsSidebar({ isCollapsible = false, onCollapse, onSelectIssue }: WorkItemsSidebarProps) {
+type WorkItemIssueCardProps = {
+  issue: JiraIssue;
+  isFavorite: boolean;
+  onSelect: (issue: JiraIssue) => void;
+  onDrag: (issue: JiraIssue, pointer: { x: number; y: number }) => void;
+};
+
+function WorkItemIssueCard({ issue, isFavorite, onSelect, onDrag }: WorkItemIssueCardProps) {
+  const dragRef = useRef<{ originX: number; originY: number; hasMoved: boolean } | null>(null);
+  const typeMark = resolveIssueTypeMark(issue.issueTypeName);
+  const accent = projectColorFromKey(issue.key);
+
+  const handlePointerDown = (event: ReactPointerEvent<HTMLButtonElement>): void => {
+    if (event.button !== 0) {
+      return;
+    }
+    dragRef.current = { originX: event.clientX, originY: event.clientY, hasMoved: false };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handlePointerMove = (event: ReactPointerEvent<HTMLButtonElement>): void => {
+    const drag = dragRef.current;
+    if (!drag || drag.hasMoved) {
+      return;
+    }
+    if (Math.hypot(event.clientX - drag.originX, event.clientY - drag.originY) < DRAG_THRESHOLD_PX) {
+      return;
+    }
+    drag.hasMoved = true;
+    event.currentTarget.releasePointerCapture(event.pointerId);
+    onDrag(issue, { x: event.clientX, y: event.clientY });
+  };
+
+  const handlePointerUp = (event: ReactPointerEvent<HTMLButtonElement>): void => {
+    const drag = dragRef.current;
+    dragRef.current = null;
+    if (!drag || drag.hasMoved) {
+      return;
+    }
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    onSelect(issue);
+  };
+
+  return (
+    <div
+      className={classNames(
+        styles.workItemsSidebar__issueCard,
+        styles[`workItemsSidebar__issueCard--${issue.statusCategory}`],
+      )}
+      style={{ ['--work-item-accent' as string]: accent }}
+    >
+      <button
+        type="button"
+        className={styles.workItemsSidebar__issueBody}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        title={`${issue.key} · ${issue.summary}. Arraste para o calendário (30 min) ou clique para editar.`}
+      >
+        <span className={styles.workItemsSidebar__issueMeta}>
+          <span
+            className={classNames(
+              styles.workItemsSidebar__issueTypeMark,
+              styles[`workItemsSidebar__issueTypeMark--${typeMark}`],
+            )}
+            aria-hidden
+          >
+            <IssueTypeIcon mark={typeMark} iconUrl={issue.issueTypeIconUrl} label={issue.issueTypeName} />
+          </span>
+          <span className={styles.workItemsSidebar__issueKey}>{issue.key}</span>
+        </span>
+        <span className={styles.workItemsSidebar__issueSummary}>{issue.summary}</span>
+        <span className={styles.workItemsSidebar__issueStatus}>
+          <StatusTag tone={STATUS_TONES[issue.statusCategory]}>
+            {issue.statusName?.trim() || STATUS_WITHOUT_LABEL}
+          </StatusTag>
+        </span>
+      </button>
+      <ActionButton
+        variant="ghost"
+        isCompact
+        icon={Star}
+        label={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+        aria-pressed={isFavorite}
+        className={classNames(
+          styles.workItemsSidebar__favorite,
+          isFavorite && styles['workItemsSidebar__favorite--active'],
+        )}
+        onClick={() => void toggleBookmark(issue.key, issue.summary)}
+      />
+    </div>
+  );
+}
+
+export function WorkItemsSidebar({
+  isCollapsible = false,
+  variant = 'sidebar',
+  onCollapse,
+  onSelectIssue,
+  onDragIssue,
+}: WorkItemsSidebarProps) {
   const { value: bookmarks } = useStoredValue('bookmarks');
-  const [activeTab, setActiveTab] = useState<WorkItemsTab>('recent');
+  const [activeTab, setActiveTab] = useState<WorkItemsTab>('assigned');
   const [query, setQuery] = useState('');
   const [hiddenStatuses, setHiddenStatuses] = useState<ReadonlySet<string>>(() => new Set());
   const [isStatusFilterOpen, setIsStatusFilterOpen] = useState(false);
   const statusFilterRef = useRef<HTMLDivElement>(null);
+  const isInline = variant === 'inline';
 
   const trimmedQuery = query.trim();
   const hasQuery = trimmedQuery.length > 0;
@@ -236,7 +345,13 @@ export function WorkItemsSidebar({ isCollapsible = false, onCollapse, onSelectIs
   };
 
   return (
-    <aside className={styles.workItemsSidebar} aria-label="Itens de trabalho">
+    <aside
+      className={classNames(
+        styles.workItemsSidebar,
+        isInline && styles['workItemsSidebar--inline'],
+      )}
+      aria-label="Itens de trabalho"
+    >
       <div className={styles.workItemsSidebar__header}>
         <div className={styles.workItemsSidebar__titleRow}>
           <h2 className={styles.workItemsSidebar__title}>Itens de trabalho</h2>
@@ -343,50 +458,21 @@ export function WorkItemsSidebar({ isCollapsible = false, onCollapse, onSelectIs
       </div>
 
       <div className={styles.workItemsSidebar__list}>
-        {isLoading && <LoadingSkeleton lines={4} />}
+        {isLoading && <LoadingSkeleton lines={isInline ? 2 : 4} />}
         {listError && !isLoading && <ErrorNotice message={listError} />}
         {!isLoading && !listError && filteredIssues.length === 0 && (
           <p className={styles.workItemsSidebar__empty}>{emptyMessage}</p>
         )}
         {!isLoading &&
-          filteredIssues.map((issue) => {
-            const typeMark = resolveIssueTypeMark(issue.issueTypeName);
-            const isFavorite = favoriteKeySet.has(issue.key);
-            return (
-              <div key={issue.key} className={styles.workItemsSidebar__issueCard}>
-                <button type="button" className={styles.workItemsSidebar__issueBody} onClick={() => onSelectIssue(issue)}>
-                  <span className={styles.workItemsSidebar__issueMeta}>
-                    <span
-                      className={classNames(
-                        styles.workItemsSidebar__issueTypeMark,
-                        styles[`workItemsSidebar__issueTypeMark--${typeMark}`],
-                      )}
-                      aria-hidden
-                    >
-                      {typeMark === 'bug' ? <Bug size={10} strokeWidth={2.5} /> : typeMark === 'story' ? '+' : '•'}
-                    </span>
-                    <span className={styles.workItemsSidebar__issueKey}>{issue.key}</span>
-                  </span>
-                  <span className={styles.workItemsSidebar__issueSummary}>{issue.summary}</span>
-                  {issue.statusName && (
-                    <StatusTag tone={STATUS_TONES[issue.statusCategory]}>{issue.statusName}</StatusTag>
-                  )}
-                </button>
-                <ActionButton
-                  variant="ghost"
-                  isCompact
-                  icon={Star}
-                  label={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
-                  aria-pressed={isFavorite}
-                  className={classNames(
-                    styles.workItemsSidebar__favorite,
-                    isFavorite && styles['workItemsSidebar__favorite--active'],
-                  )}
-                  onClick={() => void toggleBookmark(issue.key, issue.summary)}
-                />
-              </div>
-            );
-          })}
+          filteredIssues.map((issue) => (
+            <WorkItemIssueCard
+              key={issue.key}
+              issue={issue}
+              isFavorite={favoriteKeySet.has(issue.key)}
+              onSelect={onSelectIssue}
+              onDrag={onDragIssue}
+            />
+          ))}
       </div>
     </aside>
   );

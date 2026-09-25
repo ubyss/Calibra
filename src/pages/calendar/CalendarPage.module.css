@@ -3,18 +3,16 @@
   grid-template-columns: minmax(0, 1fr);
   gap: var(--space-4);
   align-items: stretch;
-}
-
-.calendarPage__layout--withSidebar {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.calendarPage__sidebar {
-  min-height: 28rem;
-  max-height: 78vh;
+  min-width: 0;
 }
 
 .calendarPage__main {
+  min-width: 0;
+}
+
+.calendarPage__tools {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   min-width: 0;
 }
 
@@ -30,16 +28,35 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-2);
 }
 
-.calendarPage__copyHint {
-  padding: 0.25rem 0.6rem;
-  border-radius: var(--radius-md);
-  background: var(--color-accent-soft);
-  color: var(--color-accent-text);
-  font-size: 0.75rem;
-  font-weight: 600;
+.calendarPage__viewToggles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.1875rem;
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius-md) + 0.1875rem);
+  background: var(--color-surface-muted);
+}
+
+.calendarPage__viewToggles > button[aria-pressed='false'] {
+  background: transparent;
+  border-color: transparent;
+}
+
+.calendarPage__viewToggles > button[aria-pressed='false']:hover:not(:disabled) {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.calendarPage__toolbarDivider {
+  display: none;
+  width: 1px;
+  height: 1.25rem;
+  background: var(--color-border-strong);
 }
 
 .calendarPage__layout--copying,
@@ -81,8 +98,8 @@
 }
 
 .calendarPage__dayChip--active {
-  background: var(--color-accent);
-  color: var(--color-on-accent);
+  background: var(--color-text);
+  color: var(--color-canvas);
 }
 
 .calendarPage__dayChipNumber {
@@ -124,13 +141,8 @@
   box-shadow: inset 3px 0 0 var(--color-border-strong);
 }
 
-@media screen and (min-width: 1024px) {
-  .calendarPage__layout--withSidebar {
-    grid-template-columns: minmax(16rem, 18.5rem) minmax(0, 1fr);
-  }
-
-  .calendarPage__sidebar {
-    min-height: 0;
-    max-height: calc(100vh - 10rem);
+@media screen and (min-width: 601px) {
+  .calendarPage__toolbarDivider {
+    display: block;
   }
 }

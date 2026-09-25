@@ -3,11 +3,11 @@ import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-d
 
 import { AppShell } from '@/components/layout/AppShell';
 import { ToastProvider } from '@/components/ui/ToastProvider';
+import { UpdateAvailableDialog } from '@/components/update/UpdateAvailableDialog';
 import { WorklogEditorProvider } from '@/components/worklog/WorklogEditorProvider';
 import { useStoredValue } from '@/hooks/useStoredValue';
 import { useTheme } from '@/hooks/useTheme';
 import { BookmarksPage } from '@/pages/bookmarks/BookmarksPage';
-import { CalendarPage } from '@/pages/calendar/CalendarPage';
 import { ConnectPage } from '@/pages/connect/ConnectPage';
 import { DashboardPage } from '@/pages/dashboard/DashboardPage';
 import { GroupsPage } from '@/pages/groups/GroupsPage';
@@ -34,9 +34,9 @@ function ConnectedRoutes() {
 
   return (
     <AppShell>
-      <Routes location={location} key={location.pathname}>
+      <Routes location={location}>
         <Route path="/" element={<DashboardPage />} />
-        <Route path="/calendario" element={<CalendarPage />} />
+        <Route path="/calendario" element={<Navigate to="/" replace />} />
         <Route path="/worklogs" element={<WorklogsPage />} />
         <Route path="/importar" element={<ImportPage />} />
         <Route path="/relatorios/horas" element={<TeamHoursReportPage />} />
@@ -60,6 +60,7 @@ export function App() {
         <HashRouter>
           <WorklogEditorProvider>
             <ConnectedRoutes />
+            <UpdateAvailableDialog />
           </WorklogEditorProvider>
         </HashRouter>
       </ToastProvider>

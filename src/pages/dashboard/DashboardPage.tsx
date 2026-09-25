@@ -1,18 +1,19 @@
+import { endOfDay, parseISO, startOfDay } from 'date-fns';
 import { Plus } from 'lucide-react';
+import { useMemo } from 'react';
 
 import { PageHeader } from '@/components/layout/PageHeader';
-import { TimerPanel } from '@/components/timer/TimerPanel';
 import { ActionButton } from '@/components/ui/ActionButton';
-import { SurfacePanel } from '@/components/ui/SurfacePanel';
 import { useWorklogEditor } from '@/components/worklog/WorklogEditorProvider';
+import { useAsync } from '@/hooks/useAsync';
 import { useStoredValue } from '@/hooks/useStoredValue';
 import { useWeekTotals } from '@/hooks/useWeekTotals';
-import { formatLongDate } from '@/utils/date';
+import { CalendarPanel } from '@/pages/calendar/CalendarPage';
+import { fetchRemoteWorklogs } from '@/services/worklog-service';
+import { formatLongDate, getWeekDays, toDateKey } from '@/utils/date';
 
 import styles from './DashboardPage.module.css';
-import { MyIssuesPanel } from './MyIssuesPanel';
-import { TodayPanel } from './TodayPanel';
-import { WeekBarsPanel } from './WeekBarsPanel';
+import { WeekOverviewPanel } from './WeekOverviewPanel';
 
 function getGreeting(hour: number): string {
   if (hour < 12) {
@@ -25,8 +26,19 @@ export function DashboardPage() {
   const { openWorklogEditor } = useWorklogEditor();
   const { value: account } = useStoredValue('account');
   const { value: worklogs } = useStoredValue('worklogs');
-  const totals = useWeekTotals(worklogs);
   const now = new Date();
+  const todayKey = toDateKey(now);
+  const weekDays = useMemo(() => getWeekDays(parseISO(todayKey)), [todayKey]);
+  const weekStart = startOfDay(weekDays[0]);
+  const weekEnd = endOfDay(weekDays[6]);
+  const weekKey = toDateKey(weekStart);
+
+  const remote = useAsync(
+    () => fetchRemoteWorklogs(account ? [account.user] : [], weekStart, weekEnd),
+    [weekKey, account?.user.id],
+    Boolean(account),
+  );
+  const totals = useWeekTotals(worklogs, remote.data ?? []);
   const firstName = account?.user.displayName.split(' ')[0] ?? '';
 
   return (
@@ -41,14 +53,8 @@ export function DashboardPage() {
         }
       />
       <div className={styles.dashboardPage}>
-        <SurfacePanel title="Timer">
-          <TimerPanel />
-        </SurfacePanel>
-        <TodayPanel totals={totals} />
-        <WeekBarsPanel totals={totals} />
-        <div className={styles.dashboardPage__wide}>
-          <MyIssuesPanel />
-        </div>
+        <WeekOverviewPanel totals={totals} />
+        <CalendarPanel />
       </div>
     </>
   );

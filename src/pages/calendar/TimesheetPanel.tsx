@@ -1,13 +1,17 @@
-import { format, parse } from 'date-fns';
+import { endOfDay, endOfMonth, format, parse, startOfMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useMemo, useState } from 'react';
 
-import { ActionButton } from '@/components/ui/ActionButton';
+import { ErrorNotice } from '@/components/ui/FeedbackStates';
 import { ModalDialog } from '@/components/ui/ModalDialog';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
+import { useAsync } from '@/hooks/useAsync';
+import { useStoredValue } from '@/hooks/useStoredValue';
+import { fetchRemoteWorklogs } from '@/services/worklog-service';
 import type { AppSettings, Worklog } from '@/types/domain';
 import type { JiraRemoteWorklog } from '@/types/jira';
-import { classNames } from '@/utils/misc';
+import { toDateKey } from '@/utils/date';
+import { classNames, getInitials } from '@/utils/misc';
 
 import {
   buildMonthCalendarWeeks,
@@ -43,6 +47,23 @@ function timesheetHoursClassName(status: TimesheetDayStatus): string {
       return styles['timesheetPanel__hours--pink'];
     case 'neutral':
       return styles['timesheetPanel__hours--neutral'];
+    default: {
+      const exhaustive: never = status;
+      return exhaustive;
+    }
+  }
+}
+
+function timesheetStatusAccentClass(status: TimesheetDayStatus): string | false {
+  switch (status) {
+    case 'green':
+      return styles['timesheetPanel__statusAccent--green'];
+    case 'orange':
+      return styles['timesheetPanel__statusAccent--orange'];
+    case 'pink':
+      return styles['timesheetPanel__statusAccent--pink'];
+    case 'neutral':
+      return false;
     default: {
       const exhaustive: never = status;
       return exhaustive;
@@ -93,7 +114,7 @@ function TimesheetWeekTable({ days }: { days: TimesheetDayEntry[] }) {
                   className={classNames(
                     styles.timesheetPanel__cell,
                     day.isWeekend && styles['timesheetPanel__cell--weekend'],
-                    hasStatus && styles[`timesheetPanel__cell--${day.status}`],
+                    hasStatus && timesheetStatusAccentClass(day.status),
                   )}
                 >
                   <span className={classNames(styles.timesheetPanel__hours, timesheetHoursClassName(day.status))}>
@@ -144,8 +165,8 @@ function TimesheetMonthCalendar({
 
         const dayDate = parse(day.date, 'yyyy-MM-dd', new Date());
         const hasLoggedHours = day.totalSeconds > 0;
-        const isToday =
-          format(dayDate, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
+        const hasStatus = hasLoggedHours && day.status !== 'neutral';
+        const isToday = format(dayDate, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
 
         return (
           <article
@@ -153,7 +174,7 @@ function TimesheetMonthCalendar({
             className={classNames(
               styles.timesheetPanel__monthDay,
               day.isWeekend && styles['timesheetPanel__monthDay--weekend'],
-              hasLoggedHours && day.status !== 'neutral' && styles[`timesheetPanel__monthDay--${day.status}`],
+              hasStatus && timesheetStatusAccentClass(day.status),
             )}
             role="gridcell"
             aria-label={`${format(dayDate, 'd MMMM', { locale: ptBR })}${
@@ -190,7 +211,15 @@ export function TimesheetPanel({
   settings,
   onClose,
 }: TimesheetPanelProps) {
-  const [rangeMode, setRangeMode] = useState<TimesheetRangeMode>('week');
+  const [rangeMode, setRangeMode] = useState<TimesheetRangeMode>('month');
+  const { value: account } = useStoredValue('account');
+  const monthKey = toDateKey(startOfMonth(referenceDate));
+
+  const monthRemote = useAsync(
+    () => fetchRemoteWorklogs(account ? [account.user] : [], startOfMonth(referenceDate), endOfDay(endOfMonth(referenceDate))),
+    [monthKey, account?.user.id],
+    isOpen && rangeMode === 'month' && Boolean(account),
+  );
 
   const range = useMemo(() => {
     if (rangeMode === 'month') {
@@ -203,25 +232,25 @@ export function TimesheetPanel({
     if (!isOpen) {
       return [];
     }
-    const entries = collectTimedEntries(worklogs, remoteWorklogs);
+    const source = rangeMode === 'month' ? monthRemote.data ?? remoteWorklogs : remoteWorklogs;
+    const entries = collectTimedEntries(worklogs, source);
     return buildTimesheetDays(entries, range.from, range.to, settings.dailyTargetHours);
-  }, [isOpen, worklogs, remoteWorklogs, range.from, range.to, settings.dailyTargetHours]);
+  }, [isOpen, rangeMode, worklogs, remoteWorklogs, monthRemote.data, range.from, range.to, settings.dailyTargetHours]);
 
   return (
-    <ModalDialog
-      isOpen={isOpen}
-      title="Timesheet"
-      description="Resumo de horas por dia na semana ou no mês."
-      isWide
-      onClose={onClose}
-      footer={
-        <ActionButton variant="secondary" onClick={onClose}>
-          Fechar
-        </ActionButton>
-      }
-    >
+    <ModalDialog isOpen={isOpen} title="Timesheet" isWide onClose={onClose}>
       <div className={styles.timesheetPanel}>
         <div className={styles.timesheetPanel__toolbar}>
+          {account ? (
+            <div className={styles.timesheetPanel__user}>
+              <span className={styles.timesheetPanel__avatar} aria-hidden>
+                {getInitials(account.user.displayName)}
+              </span>
+              <span className={styles.timesheetPanel__userName}>{account.user.displayName}</span>
+            </div>
+          ) : (
+            <span />
+          )}
           <SegmentedControl<TimesheetRangeMode>
             ariaLabel="Intervalo do timesheet"
             value={rangeMode}
@@ -247,6 +276,11 @@ export function TimesheetPanel({
             Abaixo de {settings.dailyTargetHours}h ou acima de {settings.dailyTargetHours + 1}h
           </span>
         </section>
+
+        {rangeMode === 'month' && monthRemote.isLoading && (
+          <p className={styles.timesheetPanel__empty}>Carregando as horas do mês…</p>
+        )}
+        {rangeMode === 'month' && monthRemote.error && <ErrorNotice message={monthRemote.error} />}
 
         {days.length === 0 ? (
           <p className={styles.timesheetPanel__empty}>Nenhum worklog no período selecionado.</p>

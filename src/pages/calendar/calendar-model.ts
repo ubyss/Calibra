@@ -4,7 +4,7 @@ import type { Worklog } from '@/types/domain';
 import type { JiraRemoteWorklog } from '@/types/jira';
 import { toDateKey } from '@/utils/date';
 
-export const HOUR_HEIGHT_PX = 80;
+export const HOUR_HEIGHT_PX = 100;
 export const VISIBLE_START_HOUR = 6;
 export const VISIBLE_END_HOUR = 23;
 export const SNAP_MINUTES = 15;
@@ -184,6 +184,7 @@ export function getEntryIssue(entry: CalendarEntry): {
   summary: string;
   comment: string;
   issueTypeName: string;
+  issueTypeIconUrl?: string;
 } {
   if (entry.kind === 'local') {
     return {
@@ -191,6 +192,7 @@ export function getEntryIssue(entry: CalendarEntry): {
       summary: entry.worklog.issueSummary ?? '',
       comment: entry.worklog.comment,
       issueTypeName: entry.worklog.issueTypeName ?? '',
+      issueTypeIconUrl: entry.worklog.issueTypeIconUrl,
     };
   }
   return {
@@ -198,5 +200,6 @@ export function getEntryIssue(entry: CalendarEntry): {
     summary: entry.remote.issueSummary,
     comment: entry.remote.comment,
     issueTypeName: entry.remote.issueTypeName,
+    issueTypeIconUrl: entry.remote.issueTypeIconUrl,
   };
 }

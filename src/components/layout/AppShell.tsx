@@ -48,18 +48,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         )}
       </AnimatePresence>
 
-      <AnimatePresence mode="wait">
-        <motion.main
-          key={location.pathname}
-          className={styles.appShell__main}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
-        >
-          {children}
-        </motion.main>
-      </AnimatePresence>
+      <main className={styles.appShell__main}>{children}</main>
     </div>
   );
 }
