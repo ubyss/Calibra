@@ -82,7 +82,7 @@ function computeEndTime(startTime: string, durationSeconds: number): string {
 }
 
 function snapDurationMinutes(minutes: number): number {
-  let nearest = DURATION_STOPS_MINUTES[0];
+  let nearest: number = DURATION_STOPS_MINUTES[0];
   let bestDistance = Math.abs(minutes - nearest);
   for (const stop of DURATION_STOPS_MINUTES) {
     const distance = Math.abs(minutes - stop);
